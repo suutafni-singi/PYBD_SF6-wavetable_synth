@@ -1,15 +1,17 @@
 from micropython import const
-sampleRate = const(44100.00)      # in Hz
-fNyquist = const(22050.00)
+
+sampleRate = const(96000)      # in Hz
+fNyquist = const(48000)
 bitsInPhaseReg = const(24)
 phaseRegMask = const(((1 << bitsInPhaseReg)-1)) # 0x00ffffff
 bitsInMemAddr = const(12)      # top 12 bits used to index into wavetable, 2^12 = 4096
 memTblLen = const((1 << bitsInMemAddr))  # 4096 data values in wavetable
-wavTblBitRate = const(16)      # wavetable uses single precision floating point (16 bit samples)
-bitsInAmpVal = const(16)       # 16 bit unsigned amplitude
+wavTblBitRate = const(24)      # 
+bitsInAmpVal = const(24)       # 16 bit unsigned amplitude
 numTbls = const(8)
 PI = const(double(3.141592654))
 
+# eventually needs to be 12 individual frequency functions capable of accepting input from any other signal
 def Frequency(sampCt,f=440.0):
     dFreq = double(f)
     #return int( (dFreq/sampleRate)*(1 << bitsInPhaseReg) )
@@ -20,12 +22,12 @@ def Amplitude(sampCt,a=0.5):
     #return int( dAmp * (1 << bitsInAmpVal) )
     return dAmp
 
-def Interp(sampleCt,sampleInterp,iTblIdx,tblInterp):
+def Interp(phaseReg,freqReg):
 
     halfTheSamps = float(memTblLen)/2
-    fSampleIdx = halfTheSamps + phaseReg*halfTheSamps
-    iSampleIdx = int(fSampleIdx)
-    sampleInterp = fSampleIdx - iSampleIdx
+    fSampleIdx = halfTheSamps + phaseReg*halfTheSamps  # fractional sample index
+    iSampleIdx = int(fSampleIdx)                       # integer sample index
+    sampleInterp = fSampleIdx - iSampleIdx             # the difference
 
     flevel = 0.0 - log2(2*freqReg)
     iTblIdx = int(flevel)
@@ -52,6 +54,3 @@ def Interp(sampleCt,sampleInterp,iTblIdx,tblInterp):
 
     return lowval +(tblInterp*(highval-lowval))
 
-def establishContact(serial):
-    while (!serial.isconnected()):
-        serial.send(255,timeout=500)
