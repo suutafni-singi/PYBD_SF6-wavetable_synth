@@ -5,6 +5,7 @@
 # Copyright (c) 2014 Paul Sokolovsky
 # Licensed under MIT license
 #
+
 import os
 import termios
 import ustruct
