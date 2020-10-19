@@ -79,6 +79,7 @@ future improvement</li>
     Constant, MIDI, Formula</li>
 </ul>
 <br>
+<br>
 <ul>
 <li>next 14 bytes are to get parameters in for the amplitude formula:<br>
     formula = mult1 x DATA[gen1] (op1) mult2 x DATA[gen2] (op2) mult3 * DATA[gen3]<br>
@@ -100,7 +101,7 @@ future improvement</li>
 <ul>
 <li>next 14 bytes are the exact same thing but for the frequency function(s), which<br>
    will be the same type of function as Amplitude and will do the same things</li>
-<ul>
+</ul>
 
 <p>[gen1|gen2] [gen3|op1|op2] ... [mult3[15:8]] [mult3[7:0]]</p>
 <ul>
