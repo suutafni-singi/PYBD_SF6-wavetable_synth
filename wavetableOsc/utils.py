@@ -6,7 +6,7 @@ bitsInPhaseReg = const(24)
 phaseRegMask = const(((1 << bitsInPhaseReg)-1)) # 0x00ffffff
 bitsInMemAddr = const(12)      # top 12 bits used to index into wavetable, 2^12 = 4096
 memTblLen = const((1 << bitsInMemAddr))  # 4096 data values in wavetable
-wavTblBitRate = const(24)      # 
+wavTblBitRate = const(24)      #
 bitsInAmpVal = const(24)       # 16 bit unsigned amplitude
 numTbls = const(8)
 PI = const(double(3.141592654))
@@ -54,3 +54,5 @@ def Interp(phaseReg,freqReg):
 
     return lowval +(tblInterp*(highval-lowval))
 
+class Multifunction:
+    self.__init__(num_channels=12,)
