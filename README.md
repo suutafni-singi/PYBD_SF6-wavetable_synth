@@ -1,4 +1,4 @@
-# PYBD_SF6-wavetable_synth
+-- PYBD_SF6-wavetable_synth
 
 Currently, a collection of functions that would be pretty inefficient if they were done, files lifted off of other people's repositories (thanks all!) and just generally a public embarassment.
 Eventually intended to be a wavetable synthesizer capable of producing 12 simultaneous independent signals which will/should be sent to an offboard 12-channel DAC.
@@ -34,50 +34,50 @@ a micropython bytearray or a numpy array if we can get the numpy compiler integr
       a | symbol between 2 [] delineates different pieces of data;
       a key for the values of each term is given below)
 [MIDI channel(0-15)|waveform generator #(0-12)]
-# MIDI channel will always be zero (just using it to round out bytes and for
-# future improvement)
+--MIDI channel will always be zero (just using it to round out bytes and for
+ future improvement
 [on/off(0-1)|Oscillator Type (0-5)|Maximum Amplitude Source|Frequency Source]
-# Oscillator Type can be, in ascending order: envelope, sine, triangle, saw,
-# square, noise
-# Max Amplitude Source and Frequency source can both take the values:
-# Constant, MIDI, Formula
+-- Oscillator Type can be, in ascending order: envelope, sine, triangle, saw,
+-- square, noise
+-- Max Amplitude Source and Frequency source can both take the values:
+-- Constant, MIDI, Formula
 
-# next 8 bytes are to get parameters in for the amplitude formula;
-# formula = mult1 x DATA[gen1] (op1) mult2 x DATA[gen2] (op2) mult3 * DATA[gen3]
-# where:
-#   mult_i is a 16 bit value which can multiply the values of gen_i
-#   gen_i can be whatever waveform generator the user selects, it will be a
-#     number from 0 to 11 which should serve as code to reference the
-#     corresponding buffer.
-#   op_i is one of {+,*,/} (- can be implemented using negative values for mult)
-#     {+ = 0, * = 1, / = 2}
-#   if Max Amplitude Source isn't set to Formula this can be ignored entirely;
-#   in that case I'll send a bit of 8 0's from max so you can use that as a
-#   sentinel to skip it.
+-- next 8 bytes are to get parameters in for the amplitude formula;
+-- formula = mult1 x DATA[gen1] (op1) mult2 x DATA[gen2] (op2) mult3 * DATA[gen3]
+-- where:
+--   mult_i is a 16 bit value which can multiply the values of gen_i
+--   gen_i can be whatever waveform generator the user selects, it will be a
+--     number from 0 to 11 which should serve as code to reference the
+--     corresponding buffer.
+--   op_i is one of {+,*,/} (- can be implemented using negative values for mult)
+--     {+ = 0, * = 1, / = 2}
+--   if Max Amplitude Source isn't set to Formula this can be ignored entirely;
+--   in that case I'll send a bit of 8 0's from max so you can use that as a
+--   sentinel to skip it.
 [gen1|gen2] [gen3|op1|op2] [mult1[15:8]] [mult1[7:0]] ... [mult3[15:8]][mult3[7:0]]
 
-# next eight are the exact same thing but for the frequency function(s), which
-# will be the same type of function as amplitude and will do the same things
+-- next eight are the exact same thing but for the frequency function(s), which
+-- will be the same type of function as amplitude and will do the same things
 
 [gen1|gen2] [gen3|op1|op2] ... [mult3[15:8]] [mult3[7:0]]
 
-# finally a list of amplitude points which correspond to the envelope the user
-# draws. these will be arranged as pairs of 16 bit floats (time_i,val_i) as
-# described in the section on linearInterp. A sentinel bit of 0xF7 will designate
-# the end of the list and the end of the whole message
+-- finally a list of amplitude points which correspond to the envelope the user
+-- draws. these will be arranged as pairs of 16 bit floats (time_i,val_i) as
+-- described in the section on linearInterp. A sentinel bit of 0xF7 will designate
+-- the end of the list and the end of the whole message
 
 [t1[15:8]] [v1[7:0]] ... [tN[15:8]][vN[7:0]] [11110111]
 
-# since this isn't real MIDI (midi would send most of these as 7-bit values with
-# a 0 as the first bit in each byte) and the only MIDI messages we're accepting
-# are note_on, note_off, MIDI note number and Velocity (amplitude) I'm gonna
-# completely gut the MIDI interpreter so we have as little to deal with as
-# possible. I'm hopeful we can it set up so the pyboard will be recognized as a
-# MIDI device, otherwise we'll use serial messages.
+-- since this isn't real MIDI (midi would send most of these as 7-bit values with
+-- a 0 as the first bit in each byte) and the only MIDI messages we're accepting
+-- are note_on, note_off, MIDI note number and Velocity (amplitude) I'm gonna
+-- completely gut the MIDI interpreter so we have as little to deal with as
+-- possible. I'm hopeful we can it set up so the pyboard will be recognized as a
+-- MIDI device, otherwise we'll use serial messages.
 
-# Update: for all the mult values, time values, etc we'll probably use 32 bits
-# because that gels better with single precision float... don't wanna rewrite all
-# that right now
+-- Update: for all the mult values, time values, etc we'll probably use 32 bits
+-- because that gels better with single precision float... don't wanna rewrite all
+-- that right now
 
 3.) better phase Oscillator
 4.) better wavetable program
