@@ -12,29 +12,32 @@ for all waveform generators in a single place in a fashion that allows them to<b
 easily include one another when calculating their output<br>
 something like</p><br>
 
-        '''python
+        <code>
         class Multibuffer:
-        '''  
+        </code>
 
 <p>DATA: 12 buffers with 4096 slots that can hold information about the Amplitude  
 at that sample_count for each waveform generator</p>
 
-<p>METHODS:</p><br>
+<p>METHODS:</p>
             <ul>
-            <li>Amplitude(gen_number,samp_ct): should return the value stored at<br>
+            <li>Amplitude(gen_number,samp_ct):<br>
+            should return the value stored at<br>
             DATA[gen_number][samp_ct] (would be a lot easier if we could import<br>
-            numpy, more below).</li><br>
-           <li>Interpret(sysMes): should be able to parse out the "sysex" message<br>
+            numpy, more below).</li>
+           <li>Interpret(sysMes):<br>
+            should be able to parse out the "sysex" message<br>
             (detailed below) and use that information to set the Amplitude<br>
-            function for the given generator as specified</li><br>
-           <li>LinearInterp([(time1,val1),...,(timeN,valN)]): should be able to<br>
-            connect the values in a list of points on a time(from t = 0 to timeN)<br>
-            vs Value(from a = 0. to 1.) graph with straight lines. Pretty googlable<br>
-            or I can find one (one is already sort of written for a diff purpose in<br>
-            utils.py. only needs to figure it out for each of the 4096 sample values,<br>
-            and should ultimately just load those amplitude values into the appropriate<br>
-            buffer)</li><br>
-           <li>...Maybe others?</li><br>
+            function for the given generator as specified</li>
+           <li>LinearInterp([(time1,val1),...,(timeN,valN)]):<br>
+           should be able to connect the values in a list of points on a time vs.<br>
+            value graph (with time from time1 to timeN, val from 0 to 1) with<br>
+            straight lines. Pretty googlable<br> or I can find/write one<br>
+            (one is already sort of written for a diff purpose in<br>
+            utils.py. This only needs to figure it out for each of the 4096 sample values,<br>
+            and should ultimately just load those amplitude values<br>
+            into the appropriate buffer)</li>
+           <li>...Maybe others?</li>
            </ul>
            </li>
 
@@ -45,30 +48,45 @@ at that sample_count for each waveform generator</p>
 
 <p>(key: the space between each "[...]" represents one byte (8 bits);<br>
     a "|"" symbol between "[" and "]" delineates different pieces of data;<br>
-    a key for the values of each term is given below)</p><br>
+    a breakdown with explanations for each part of the message is given below<br>
+    the full message</p>
 
+<p>[1111 0000] [0111 1101]<br>
+[MIDI channel(0-15)|waveform generator #(0-12)]<br>
+[on/off(0-1)|Oscillator Type (0-5)|Maximum Amplitude Source(0-2)|Frequency Source(0-2)]<br>
+[gen1|gen2] [gen3|op1|op2] [mult1[31:24]] [mult1[23:16]] [mult1[15:8]] [mult1[7:0]]<br>
+[mult2[31:24]] ... [mult3[15:8]] [mult3[7:0]]<br>
+[gen1|gen2] [gen3|op1|op2] [mult1[31:24]] [mult1[23:16]] [mult1[15:8]] [mult1[7:0]]<br>
+[mult2[31:24]] ... [mult3[15:8]] [mult3[7:0]]<br>
+[t1[31:24]] [t1[23:16]] [t1[15:8]] [t1[7:0]] [v1[31:24]] [v1[23:16]] [v1[15:8]] [v1[7:0]]<br>
+...<br>
+[tN[31:24]] [tN[23:16]] ... [vN[15:8]] [vN[7:0]]<br>
+[1111 0111]</p><br>
+
+<p>[1111 0000] (xF0) is the MIDI value indicating the start of a sysex message</p>
+
+<p>[0111 1101] (x7D) is where we would put a manufacturer-identifier if we were<br>
+a manufacturer... we're not so this is the ID set aside for "non-commercial/educational use"<br>
 
 <p>[MIDI channel(0-15)|waveform generator #(0-12)]</p>
-
 <ul>
 <li>MIDI channel will always be zero (just using it to round out bytes and for<br>
-    future improvement</li><br>
+future improvement</li>
 </ul>
 <p>[on/off(0-1)|Oscillator Type (0-5)|Maximum Amplitude Source|Frequency Source]</p>
 <ul>
 <li>Oscillator Type can be, in ascending order: Envelope, sine, triangle, saw,<br>
    square, noise<br>
     Envelopes only have amplitude data (because they're DC) so their frequency<br>
-    functions can be zero.</li><br>
+    functions can be zero.</li>
 <li>Max Amplitude Source and Frequency source can both take the values:<br>
     Constant, MIDI, Formula</li>
 </ul>
 <br>
-<br>
 <ul>
 <li>next 14 bytes are to get parameters in for the amplitude formula:<br>
     formula = mult1 x DATA[gen1] (op1) mult2 x DATA[gen2] (op2) mult3 * DATA[gen3]<br>
-    where:<br>
+    where:
     <ul>
   <li>mult_i is a 32 bit float which can multiply the values of gen_i</li>
   <li>gen_i can be whatever waveform generator the user selects, it will be a<br>
@@ -113,5 +131,15 @@ at that sample_count for each waveform generator</p>
 
 <li>better phase Oscillator (working on it)</li>
 
-<li>better wavetable program</li>
+<li>better wavetable program
+<ul>
+<li>current one only does sawtooth</li>
+<li>I'm gonna try and type up a better one (snagged from ece402) but the one listed<br>
+in that book I sent y'all will probably not be fast enough</li>
+<ul></li>
+
+<li>Event Scheduler</li>
+
+<li>MIDI note stack</li>
+
 </ol>
