@@ -4,8 +4,10 @@ Currently, a collection of functions that would be pretty inefficient if they we
 Eventually intended to be a wavetable synthesizer capable of producing 12 simultaneous independent signals which will/should be sent to an offboard 12-channel DAC.
 We'll see!
 
-What we need:
-1.) A structure that allows for the storage of all (e.g.) Amplitude functions
+# What we need:
+
+# 1.)
+A structure that allows for the storage of all (e.g.) Amplitude functions
 for all waveform generators in a single place in a fashion that allows them to
 easily include one another when calculating their output
 something like class Multibuffer:
@@ -26,7 +28,7 @@ METHODS:   -Amplitude(gen_number,samp_ct): should return the value stored at
             buffer)
           -Maybe others?
 
-2.)
+# 2.)
 an overall interpreter/router for the sysex message received from max:
 this should accept the following byte code which will be in the form of either
 a micropython bytearray or a numpy array if we can get the numpy compiler integrated.
@@ -79,7 +81,17 @@ a micropython bytearray or a numpy array if we can get the numpy compiler integr
 -- because that gels better with single precision float... don't wanna rewrite all
 -- that right now
 
-3.) better phase Oscillator
-4.) better wavetable program
+summing it all up:
+[MIDI channel(0-15)|waveform generator #(0-12)]
+[on/off(0-1)|Oscillator Type (0-5)|Maximum Amplitude Source|Frequency Source]
+[gen1|gen2] [gen3|op1|op2] [mult1[15:8]] [mult1[7:0]] ... [mult3[15:8]][mult3[7:0]]
+[gen1|gen2] [gen3|op1|op2] ... [mult3[15:8]] [mult3[7:0]]
+[t1[15:8]] [v1[7:0]] ... [tN[15:8]][vN[7:0]] [11110111]
+
+
+# 3.)
+better phase Oscillator (working on it)
+# 4.) 
+better wavetable program
 wow man I gotta go. I will work on defining this better tomorrow
 (vague promise made on 10/18/20)
