@@ -133,7 +133,9 @@ future improvement</li>
 <li>current one only does sawtooth</li>
 <li>I'm gonna try and type up a better one (snagged from ece402) but the one listed<br>
 in that book I sent y'all will probably not be fast enough</li>
-<ul></li>
+</ul>
+</li>
+
 
 <li>Event Scheduler</li>
 
