@@ -22,21 +22,17 @@ at that sample_count for each waveform generator</p>
 <p>METHODS:</p>
             <ul>
             <li>Amplitude(gen_number,samp_ct):<br>
-            should return the value stored at<br>
-            DATA[gen_number][samp_ct] (would be a lot easier if we could import<br>
-            numpy, more below).</li>
+            should return the value stored at DATA[gen_number][samp_ct] (would be<br>
+            a lot easier if we could import numpy, more below).</li>
            <li>Interpret(sysMes):<br>
-            should be able to parse out the "sysex" message<br>
-            (detailed below) and use that information to set the Amplitude<br>
-            function for the given generator as specified</li>
+            should be able to parse out the "sysex" message (detailed below) and use that<br>
+            information to set the Amplitude function for the given generator as specified</li>
            <li>LinearInterp([(time1,val1),...,(timeN,valN)]):<br>
-           should be able to connect the values in a list of points on a time vs.<br>
-            value graph (with time from time1 to timeN, val from 0 to 1) with<br>
-            straight lines. Pretty googlable<br> or I can find/write one<br>
-            (one is already sort of written for a diff purpose in<br>
+           should be able to connect the values in a list of points on a time vs. value graph<br>
+            (with time from time1 to timeN, val from 0 to 1) using straight lines. Pretty googlable<br>
+            or I can find/write one (one is already sort of written for a diff purpose in<br>
             utils.py. This only needs to figure it out for each of the 4096 sample values,<br>
-            and should ultimately just load those amplitude values<br>
-            into the appropriate buffer)</li>
+            and should ultimately just load those amplitude values into the appropriate buffer)</li>
            <li>...Maybe others?</li>
            </ul>
            </li>
