@@ -72,8 +72,8 @@ future improvement</li>
 <p>[on/off(0-1)|Oscillator Type (0-5)|Maximum Amplitude Source|Frequency Source]</p>
 <ul>
 <li>Oscillator Type can be, in ascending order: Envelope, sine, triangle, saw,<br>
-   square, noise<br>
-    Envelopes only have amplitude data (because they're DC) so their frequency<br>
+   square, noise</li>
+<li>Envelopes only have amplitude data (because they're DC) so their frequency<br>
     functions can be zero.</li>
 <li>Max Amplitude Source and Frequency source can both take the values:<br>
     Constant, MIDI, Formula</li>
