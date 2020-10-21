@@ -19,8 +19,20 @@ def reset_generators():
 # 1 - Waveform generator
 # 2 - on/off
 # 3 - oscillator type
+#    0: envelope
+#    1: sine
+#    2: sawtooth
+#    3: triangle
+#    4: square
+#    5: noise
 # 4 - Max amplitude source
+#    0: constant
+#    1: MIDI
+#    2: formula
 # 5 - Max frequency source
+#    0: constant
+#    1: MIDI
+#    2: formula
 
 # Amplitude
 # 6 - amplitude gen1
