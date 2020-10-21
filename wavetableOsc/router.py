@@ -1,11 +1,13 @@
 import numpy as np
 generators = np.zeros((12,22))
+amp_formula_check = 0 # Checks if amplitude formula is set in struct before reading amplitude values
+freq_formula_check = 0 # Checks if frequency formula is set in struct before reading amplitude values
 
 
 def main():
     reset_generators()
 
-    arg = 0xF07D0AC5FFFF0000000A0000000000000007FFFF0000000A0000000000000007
+    arg = 0xF07D01C5FFFF0000000A0000000000000007FFFF0000000A0000000000000007
     parse_message(arg)
 
 def reset_generators():
@@ -79,82 +81,89 @@ def parse_message(arg):
     generators[gen_index][3] = osc_type
 
     # If 0, or 1... can bypass formula reading
-
     # If 2, trigger formula
 
     # max amp
     amp = ((arg >> 224) & 0xC) >> 2 #Shift 28 bytes, bit_mask hi 2 bits
+    if(amp == 2):
+        amp_formula_check = 1
     generators[gen_index][4] = amp
 
     # freq source
     freq = ((arg >> 224) & 0x3) #Shift 28 bytes, bit_mask low 2 bits
+    
+    if(freq == 2):
+        freq_formula_check = 1
     generators[gen_index][5] = freq
-
+    
     # Amplitude - Next 14 bytes
-    # gen1
-    amp_gen1 = ((arg >> 216) & 0xF0) >> 4 #Shift 27 bytes, bit_mask hi 4 bits
-    generators[gen_index][6] = amp_gen1 
+    if(amp_formula_check):
+        # gen1
+        amp_gen1 = ((arg >> 216) & 0xF0) >> 4 #Shift 27 bytes, bit_mask hi 4 bits
+        generators[gen_index][6] = amp_gen1 
 
-    # gen2
-    amp_gen2 = ((arg >> 216) & 0x0F) #Shift 27 bytes, bit_mask lo 4 bits
-    generators[gen_index][7] = amp_gen2 
+        # gen2
+        amp_gen2 = ((arg >> 216) & 0x0F) #Shift 27 bytes, bit_mask lo 4 bits
+        generators[gen_index][7] = amp_gen2 
 
-    # gen3
-    amp_gen3 = ((arg >> 208) & 0xF0) >> 4 #Shift 26 bytes, bit_mask hi 4 bits
-    generators[gen_index][8] = amp_gen3
+        # gen3
+        amp_gen3 = ((arg >> 208) & 0xF0) >> 4 #Shift 26 bytes, bit_mask hi 4 bits
+        generators[gen_index][8] = amp_gen3
 
-    # op1
-    amp_op1 = ((arg >> 208) & 0xC) >> 2 #Shift 26 bytes, bit_mask hi 4 bits
-    generators[gen_index][9] = amp_op1 
+        # op1
+        amp_op1 = ((arg >> 208) & 0xC) >> 2 #Shift 26 bytes, bit_mask hi 4 bits
+        generators[gen_index][9] = amp_op1 
 
-    # op2
-    amp_op2 = ((arg >> 208) & 0x3) #Shift 26 bytes, bit_mask hi 4 bits
-    generators[gen_index][10] = amp_op2
+        # op2
+        amp_op2 = ((arg >> 208) & 0x3) #Shift 26 bytes, bit_mask hi 4 bits
+        generators[gen_index][10] = amp_op2
 
-    # mult1
-    amp_mult1 = ((arg >> 176) & 0xFFFFFFFF) #Shift 22 bytes, bit_mask 4 bytes
-    generators[gen_index][11] = amp_mult1
+        # mult1
+        amp_mult1 = ((arg >> 176) & 0xFFFFFFFF) #Shift 22 bytes, bit_mask 4 bytes
+        generators[gen_index][11] = amp_mult1
 
-    # mult2
-    amp_mult2 = ((arg >> 144) & 0xFFFFFFFF) #Shift 18 bytes, bit_mask 4 bytes
-    generators[gen_index][12] = amp_mult2
+        # mult2
+        amp_mult2 = ((arg >> 144) & 0xFFFFFFFF) #Shift 18 bytes, bit_mask 4 bytes
+        generators[gen_index][12] = amp_mult2
 
-    # mult3
-    amp_mult3 = ((arg >> 112) & 0xFFFFFFFF) #Shift 14 bytes, bit_mask 4 bytes
-    generators[gen_index][13] = amp_mult3
+        # mult3
+        amp_mult3 = ((arg >> 112) & 0xFFFFFFFF) #Shift 14 bytes, bit_mask 4 bytes
+        generators[gen_index][13] = amp_mult3
 
+    
     # Frequency - Next 14 bytes
-    # gen1
-    freq_gen1 = ((arg >> 216) & 0xF0) >> 4 #Shift 27 bytes, bit_mask hi 4 bits
-    generators[gen_index][14] = freq_gen1 
+    if(freq_formula_check):
+        # gen1
+        freq_gen1 = ((arg >> 216) & 0xF0) >> 4 #Shift 27 bytes, bit_mask hi 4 bits
+        generators[gen_index][14] = freq_gen1 
 
-    # gen2
-    freq_gen2 = ((arg >> 216) & 0x0F) #Shift 27 bytes, bit_mask lo 4 bits
-    generators[gen_index][15] = freq_gen2
+        # gen2
+        freq_gen2 = ((arg >> 216) & 0x0F) #Shift 27 bytes, bit_mask lo 4 bits
+        generators[gen_index][15] = freq_gen2
 
-    # gen3
-    freq_gen3 = ((arg >> 208) & 0xF0) >> 4 #Shift 26 bytes, bit_mask hi 4 bits
-    generators[gen_index][16] = freq_gen3
+        # gen3
+        freq_gen3 = ((arg >> 208) & 0xF0) >> 4 #Shift 26 bytes, bit_mask hi 4 bits
+        generators[gen_index][16] = freq_gen3
 
-    # op1
-    freq_op1 = ((arg >> 208) & 0xC) >> 2 #Shift 26 bytes, bit_mask hi 4 bits
-    generators[gen_index][17] = freq_op1
+        # op1
+        freq_op1 = ((arg >> 208) & 0xC) >> 2 #Shift 26 bytes, bit_mask hi 4 bits
+        generators[gen_index][17] = freq_op1
 
-    # op2
-    freq_op2 = ((arg >> 208) & 0x3) #Shift 26 bytes, bit_mask hi 4 bits
-    generators[gen_index][18] = freq_op2
+        # op2
+        freq_op2 = ((arg >> 208) & 0x3) #Shift 26 bytes, bit_mask hi 4 bits
+        generators[gen_index][18] = freq_op2
 
-    # mult1
-    freq_mult1 = ((arg >> 176) & 0xFFFFFFFF) #Shift 22 bytes, bit_mask 4 bytes
-    generators[gen_index][19] = freq_mult1
+        # mult1
+        freq_mult1 = ((arg >> 176) & 0xFFFFFFFF) #Shift 22 bytes, bit_mask 4 bytes
+        generators[gen_index][19] = freq_mult1
 
-    # mult2
-    freq_mult2 = ((arg >> 144) & 0xFFFFFFFF) #Shift 18 bytes, bit_mask 4 bytes
-    generators[gen_index][20] = freq_mult2
+        # mult2
+        freq_mult2 = ((arg >> 144) & 0xFFFFFFFF) #Shift 18 bytes, bit_mask 4 bytes
+        generators[gen_index][20] = freq_mult2
 
-    # mult3
-    freq_mult3 = ((arg >> 112) & 0xFFFFFFFF) #Shift 14 bytes, bit_mask 4 bytes
-    generators[gen_index][21] = freq_mult3
+        # mult3
+        freq_mult3 = ((arg >> 112) & 0xFFFFFFFF) #Shift 14 bytes, bit_mask 4 bytes
+        generators[gen_index][21] = freq_mult3
 
     # handle list of amplitude points (2-4 byte floats - (time_i,val_i))
     print(generators[gen_index])
