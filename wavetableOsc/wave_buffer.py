@@ -167,7 +167,7 @@ class wave_buffer:
 
         # list of slopes (between each point)
         for x in range(point_amount[index] - 1):
-            slopes[x] = (list_array[2(x+1) + 1] - list_array[2(x) + 1])/(list_array[2(x+1)] - list_array[2(x)])
+            slopes[x] = (point_array[2(x+1) + 1] - point_array[2(x) + 1])/(point_array[2(x+1)] - point_array[2(x)])
 
         # Set the array value with locations in interpolated 4096-size buffer
         for x in range(point_amount[index]):
@@ -180,42 +180,44 @@ class wave_buffer:
         #There will always be at least two points in the array
         x_first = 0
         x_next = 0
-        point_A = 0
-        point_B = 0
         slope_index = 0
 
         # check which set of points value is between the indices
         for x in range(point_amount[index]):
+            point_offset = point_array[(2 * x) + 1]
             if(x == 0):
-                x_next = point_amount[1]
-                wave_forms
+                x_next = point_array[index][2] # Get array location of second point
+
+                # Loop from index 0to index x_next - 1
                 for y in range(x_next):
                     if(y == 0):
-                        wave_forms[index][0] = list_array[1]
+                        wave_forms[index][0] = point_array[1] # Set amplitude of first point
                     else:
-                        wave_forms[index][y] = wave_forms[index][y - 1] + y * slope[slope_index]
+                        wave_forms[index][y] = point_offset + (y * slopes[slope_index]) # Interpolate amplitude at current height
+
+                # Get slope of the next interval
                 slope_index += 1
             else:
-                x_first = point_amount[x]
-                x_next = point_amount[x+1]
+                x_first = point_array[index][x] # Update x_first with low bound of interval
+                x_next = point_array[index][x+1] # Update x_next with high bound of interval
 
                 # Check if final index point
                 if(x_next == (buffer_points - 1)):
+                    # If last interval, make sure it goes through point 4095... x_next is 4095 and range is not inclusive on the higher end
                     for y in range(x_first,(x_next + 1)):
                         # Calculate points incrementally
-                        wave_forms[index][y] = wave_forms[index][y - 1] + y * slope[slope_index]
-
+                        wave_forms[index][y] = point_offset + (((x_next - x_first) - y) * slope[slope_index])
                 else:
+                    # Handle normal inter values
+                    # Will fill wave_form values from (x_first) to (x_next - 1)
                     for y in range(x_first,x_next):
                         # Calculate points incrementally
-                        wave_forms[index][y] = wave_forms[index][y - 1] + y * slope[slope_index]
-                    slope_index += 1
+                        wave_forms[index][y] = point_offset + (((x_next - x_first) - y) * slope[slope_index])
 
-        # Find the diff between each x, they are the points in the buffer
+                # Get slope of the next interval
+                slope_index += 1
 
-        # Find the diff between each height and updte the total dif/points underneath to get the delta
-
-        return 0
+            # wave_form shouldbe set from 0 to 4096 for the given index
 
 
     def getAmplitude(gen_index,samp_num):
