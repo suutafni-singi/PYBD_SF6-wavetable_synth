@@ -90,6 +90,9 @@ class wave_buffer:
                 amp_mult3 = ((arg >> 112) & 0xFFFFFFFF) #Shift 14 bytes, bit_mask 4 bytes
                 generators[gen_index][13] = amp_mult3
 
+                # Set waveform amplitudes based off formula
+                set_waveforms[gen_index]
+
 
             # Frequency - Next 14 bytes
             if(freq_formula_check):
@@ -131,19 +134,91 @@ class wave_buffer:
         # set_amplitude_formula(generators, gen_index, amp_gen1, amp_gen2, amp_gen3, amp_op1, amp_op2, amp_mult1, amp_mult2, amp_mult3)
         # set_freq_formula(generators, gen_index, freq_gen1, freq_gen2, freq_gen3, freq_op1, freq_op2, freq_mult1, freq_mult2, freq_mult3)
 
-        # handle list of amplitude points (2-4 byte floats - (time_i,val_i))
+        # handle list of amplitude points (2-4 byte floats - (time_i,val_i)), if necessary
+        if(amp_source)
+
         # test generator
-        print(generators[gen_index])
+        # print(generators[gen_index])
 
         update_wave(gen_index)
 
-    def set_waveforms():
+    def set_waveforms(index):
         # Set wave_generators from functions
-        return 0
+        # index = index in generators array
 
-    def update_wave(index):
-        # Updates wave_generator when generator is updated
-        return 0
+        # if loops for each of the operand set-ups in formula (should be like 6 i think or something)
+
+        # Amplitude values
+        # 6 -> amp_gen1
+        # 7 -> amp_gen2
+        # 8 -> amp_gen3
+        # 9 -> amp_op1
+        # 10 -> amp_op2
+        # 11 -> amp_mult1
+        # 12 -> amp_mult2
+        # 13 -> amp_mult3
+        gen1 = generators[index][6]
+        gen2 = generators[index][7]
+        gen3 = generators[index][8]
+        mult1 = generators[index][11]
+        mult2 = generators[index][12]
+        mult3 = generators[index][13]
+
+        if(generators[index][9] == 0 and generators[index][10] == 0):
+            # Calculate value of current generator's waveform for each sample using formula
+            for x in range(4096):
+                #amp_op1 = +
+                #amp_op2 = +
+                wave_forms[index][x] = (wave_forms[gen1][x] * mult1) + (wave_forms[gen2][x] * mult2) + (wave_forms[gen3][x] * mult3)
+
+        elif(generators[index][9] == 0 and generators[index][10] == 1):
+            # Calculate value of current generator's waveform for each sample using formula
+            for x in range(4096):
+                #amp_op1 = +
+                #amp_op2 = *
+                wave_forms[index][x] = (wave_forms[gen1][x] * mult1) + (wave_forms[gen2][x] * mult2) * (wave_forms[gen3][x] * mult3)
+        elif(generators[index][9] == 0 and generators[index][10] == 2):
+            # Calculate value of current generator's waveform for each sample using formula
+            for x in range(4096):
+                #amp_op1 = +
+                #amp_op2 = /
+                wave_forms[index][x] = (wave_forms[gen1][x] * mult1) + (wave_forms[gen2][x] * mult2) / (wave_forms[gen3][x] * mult3)
+        elif(generators[index][9] == 1 and generators[index][10] == 0):
+            # Calculate value of current generator's waveform for each sample using formula
+            for x in range(4096):
+                #amp_op1 = *
+                #amp_op2 = +
+                wave_forms[index][x] = (wave_forms[gen1][x] * mult1) * (wave_forms[gen2][x] * mult2) + (wave_forms[gen3][x] * mult3)
+        elif(generators[index][9] == 1 and generators[index][10] == 1):
+            # Calculate value of current generator's waveform for each sample using formula
+            for x in range(4096):
+                #amp_op1 = *
+                #amp_op2 = *
+                wave_forms[index][x] = (wave_forms[gen1][x] * mult1) * (wave_forms[gen2][x] * mult2) * (wave_forms[gen3][x] * mult3)
+        elif(generators[index][9] == 1 and generators[index][10] == 2):
+            # Calculate value of current generator's waveform for each sample using formula
+            for x in range(4096):
+                #amp_op1 = *
+                #amp_op2 = /
+                wave_forms[index][x] = (wave_forms[gen1][x] * mult1) * (wave_forms[gen2][x] * mult2) / (wave_forms[gen3][x] * mult3)
+        elif(generators[index][9] == 2 and generators[index][10] == 0):
+            # Calculate value of current generator's waveform for each sample using formula
+            for x in range(4096):
+                #amp_op1 = /
+                #amp_op2 = +
+                wave_forms[index][x] = (wave_forms[gen1][x] * mult1) / (wave_forms[gen2][x] * mult2) + (wave_forms[gen3][x] * mult3)
+        elif(generators[index][9] == 2 and generators[index][10] == 1):
+            # Calculate value of current generator's waveform for each sample using formula
+            for x in range(4096):
+                #amp_op1 = /
+                #amp_op2 = *
+                wave_forms[index][x] = (wave_forms[gen1][x] * mult1) / (wave_forms[gen2][x] * mult2) * (wave_forms[gen3][x] * mult3)
+        elif(generators[index][9] == 2 and generators[index][10] == ):
+            # Calculate value of current generator's waveform for each sample using formula
+            for x in range(4096):
+                #amp_op1 = /
+                #amp_op2 = /
+                wave_forms[index][x] = (wave_forms[gen1][x] * mult1) / (wave_forms[gen2][x] * mult2) / (wave_forms[gen3][x] * mult3)
 
     def parse_array_bytes(gen_index,num, arg):
         # Appends to point_array from the first point to the final one
@@ -219,15 +294,18 @@ class wave_buffer:
 
             # wave_form shouldbe set from 0 to 4096 for the given index
 
-
+    # Returns amplitude at given sample_num for the given generator
     def getAmplitude(gen_index,samp_num):
         return wave_forms[gen_index][samp_num]
 
 
     def reset_generators():
+        # reset generator formulas
         generators = np.zeros((12,22))
 
+        # Set index calue for each generator
         for x in range(12):
             generators[x][1] = x
 
+        # Refill wave_forms array with all zeros
         wave_forms = np.zeros(12,4096)
