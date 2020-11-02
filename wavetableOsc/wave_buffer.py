@@ -1,20 +1,21 @@
 import numpy as np
 
 class wave_buffer:
-    #Initialize generator array to store update settings
-    generators = np.zeros((12,22))
+    self.__init__():
+        #Initialize generator array to store update settings
+        self.generators = np.zeros((12,22))
 
-    #Initialize array of sample points
-    wave_forms = np.zeros(12, 4096)
+        #Initialize array of sample points
+        self.wave_forms = np.zeros(12, 4096)
 
-    # The number of points defined by the user-drawn envelope
-    point_amount = np.zeros(12)
+        # The number of points defined by the user-drawn envelope
+        self.point_amount = np.zeros(12)
 
-    # Array of point values to interpolate... (time, amplitude)
-    point_array = np.array([],[],[],[],[],[],[],[],[],[],[],[])
+        # Array of point values to interpolate... (time, amplitude)
+        self.point_array = np.array([],[],[],[],[],[],[],[],[],[],[],[])
 
     # Function header
-    def update_generator(arg):
+    def update_generator(self,arg):
         gen_index = 0 # Index of generator to update
         amp_formula_check = 0 # Checks if amplitude formula is set in struct before reading amplitude values
         freq_formula_check = 0 # Checks if frequency formula is set in struct before reading amplitude values
@@ -135,14 +136,14 @@ class wave_buffer:
         # set_freq_formula(generators, gen_index, freq_gen1, freq_gen2, freq_gen3, freq_op1, freq_op2, freq_mult1, freq_mult2, freq_mult3)
 
         # handle list of amplitude points (2-4 byte floats - (time_i,val_i)), if necessary
-        if(amp_source)
+        if(amp_source):
 
         # test generator
         # print(generators[gen_index])
 
         update_wave(gen_index)
-
-    def set_waveforms(index):
+        ############# should this be indented (is it subject to the if statement?)
+    def set_waveforms(self,index):
         # Set wave_generators from functions
         # index = index in generators array
 
@@ -220,7 +221,7 @@ class wave_buffer:
                 #amp_op2 = /
                 wave_forms[index][x] = (wave_forms[gen1][x] * mult1) / (wave_forms[gen2][x] * mult2) / (wave_forms[gen3][x] * mult3)
 
-    def parse_array_bytes(gen_index,num, arg):
+    def parse_array_bytes(self,gen_index,num, arg):
         # Appends to point_array from the first point to the final one
         for i in range(num):
              shift_value = (num - i - 1) # If num = 3, cycles through shifts of 2,1,0
@@ -228,7 +229,7 @@ class wave_buffer:
              point_array[gen_index].append((arg >> (64 * shift_value)) & 0xFFFFFFFF) # Get amplitude value
 
     # set wave_generators from packet
-    def lin_interpolation(index,list_array):
+    def lin_interpolation(self,index,list_array):
         # Initialize local variables
         buffer_points = 4096
         # get size of list_array and divide by two, the number of pairs
@@ -243,7 +244,7 @@ class wave_buffer:
         # list of slopes (between each point)
         for x in range(point_amount[index] - 1):
             slopes[x] = (point_array[2(x+1) + 1] - point_array[2(x) + 1])/(point_array[2(x+1)] - point_array[2(x)])
-
+            ############### this looks like you're using 2 as a function; I'm guessing you just forgot a * symbol?
         # Set the array value with locations in interpolated 4096-size buffer
         for x in range(point_amount[index]):
             if(x == point_amount[index] - 1):
@@ -295,11 +296,11 @@ class wave_buffer:
             # wave_form shouldbe set from 0 to 4096 for the given index
 
     # Returns amplitude at given sample_num for the given generator
-    def getAmplitude(gen_index,samp_num):
+    def getAmplitude(self,gen_index,samp_num):
         return wave_forms[gen_index][samp_num]
 
 
-    def reset_generators():
+    def reset_generators(self):
         # reset generator formulas
         generators = np.zeros((12,22))
 
