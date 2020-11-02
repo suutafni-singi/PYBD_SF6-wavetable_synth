@@ -6,7 +6,9 @@ class wave_buffer:
         self.generators = np.zeros((12,22))
 
         #Initialize array of sample points
-        self.wave_forms = np.zeros(12, 4096)
+        self.wave_forms = np.zeros((12,4096))
+        ####### the 4096 points thing isn't gonna work tragically... i think there's a quick
+        ####### fix for the initialization, I can update you guys through zoom tomorrow
 
         # The number of points defined by the user-drawn envelope
         self.point_amount = np.zeros(12)
