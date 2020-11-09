@@ -1,14 +1,9 @@
 import numpy as np
 
 class wave_buffer:
-    self.__init__():
+    def __init__():
         #Initialize generator array to store update settings
         self.generators = np.zeros((12,22))
-
-        #Initialize array of sample points
-        self.wave_forms = np.zeros((12,4096))
-        ####### the 4096 points thing isn't gonna work tragically... i think there's a quick
-        ####### fix for the initialization, I can update you guys through zoom tomorrow
 
         # The number of points defined by the user-drawn envelope
         self.point_amount = np.zeros(12)
@@ -138,7 +133,7 @@ class wave_buffer:
         # set_freq_formula(generators, gen_index, freq_gen1, freq_gen2, freq_gen3, freq_op1, freq_op2, freq_mult1, freq_mult2, freq_mult3)
 
         # handle list of amplitude points (2-4 byte floats - (time_i,val_i)), if necessary
-        if(amp_source):
+        # if(amp_source):
 
         # test generator
         # print(generators[gen_index])
@@ -167,6 +162,7 @@ class wave_buffer:
         mult2 = generators[index][12]
         mult3 = generators[index][13]
 
+        # Adjust for unknown wave_length of waveforms (stored in the waveTableOsc class's wavetables variable)
         if(generators[index][9] == 0 and generators[index][10] == 0):
             # Calculate value of current generator's waveform for each sample using formula
             for x in range(4096):
