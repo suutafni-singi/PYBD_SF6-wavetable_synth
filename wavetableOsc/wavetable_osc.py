@@ -201,7 +201,7 @@ def set_sawtooth_osc(osc,base_freq):
     max_harms = int(sampleRate / (3.o * base_freq) + 0.5)
 
     # Round up to the nearest power of two
-    v = maxHarms
+    v = max_harms
     v = v - 1  # So we don't go up if already a power of 2
     v = v | (v >> 1) # Roll the highest bit into all lower bits...
     v = v | (v >> 2)
