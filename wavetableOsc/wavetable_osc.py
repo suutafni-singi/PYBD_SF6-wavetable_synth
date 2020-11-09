@@ -40,7 +40,7 @@ class WaveTableOsc:
     numWaveTableSlots = 32
 
     # waveTable struct variables
-    wave_topfreq = np.zeros(numWaveTables)
+    wave_topfreq = np.zeros(numWaveTableSlots)
     wave_length = np.zeros(numWaveTableSlots)
     wavetables = np.zeros(numWaveTableSlots)
 
