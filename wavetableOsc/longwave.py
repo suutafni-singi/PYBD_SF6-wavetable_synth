@@ -5,6 +5,12 @@ Stuff to play long WAVE files.
 Double buffered, using a timer to reload the DAC and a poll function to
 fill up the queue.
 Works well with 200ms of audio, and polled at about 100ms
+
+WAV player for MicroPython board
+
+Uses double buffered approach to load chunks of samples. Needs to be polled frequently so the chunks can be refreshed.
+
+Copyright: Matt Page / mattmatic@hotmail.com
 """
 
 import wave
