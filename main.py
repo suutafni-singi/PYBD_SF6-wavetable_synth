@@ -17,7 +17,7 @@ sample_rate = 44100 # Audio sample rate
 test = 0
 
 # clk_id for System-wide real-time clock
-clk_id1 = time.CLOCK_REALTIME
+clk_id1 = CLOCK_REALTIME
 
 # Sound file variables
 num_secs = 20.0 # Length of sound file to generate
