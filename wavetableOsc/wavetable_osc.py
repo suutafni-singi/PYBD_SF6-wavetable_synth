@@ -14,6 +14,167 @@ constantRatioLimit = 99999 # set to a large number (>= length of lowest octave t
 # table reduced by half); set somewhere between (64, for instance) for constant
 # oversampling but with a minimum limit
 
+# Wave generator class
+#
+# Contains arrays containing information to form waveforms
+
+def Generator:
+    #Initialize generator array to store update settings
+    generators = np.zeros((12,22))
+
+    # The number of points defined by the user-drawn envelope
+    point_amount = np.zeros(12)
+
+    # Array of point values to interpolate... (time, amplitude)
+    point_array = np.array([],[],[],[],[],[],[],[],[],[],[],[])
+
+    # init method or constructor
+    def __init__(self):
+        reset_generators()
+
+    # Function header
+    def update_generator(arg):
+        gen_index = 0 # Index of generator to update
+        amp_formula_check = 0 # Checks if amplitude formula is set in struct before reading amplitude values
+        freq_formula_check = 0 # Checks if frequency formula is set in struct before reading amplitude values
+
+        # arg is an array of 30-byte array, 240 bits
+
+        # 0xF0 is the MIDI indicating the start of a sysex message
+        # 0x7D will be set to "non-commercial/educational use"
+
+        # First byte handles MIDI channel and waveform generator
+        # MIDI channel will always be set to zero (hi-bytes)
+
+        # low 4-bits set waveform generator
+        gen_index = (arg >> 232) & 0xF #Shift 29 bytes, then bit_mask to get low_4 bytes
+        generators[gen_index][1] = gen_index
+
+        # oscillator on/off
+        osc = ((arg >> 228) & 0x8) >> 3 #Shift 28.5 bytes, bit_mask top bit, then shift into lowest bit
+        generators[gen_index][2] = osc
+
+        # oscillator type
+        osc_type = ((arg >> 228) & 0x7) #Shift 28.5 bytes, bit_mask low 3 bits
+        generators[gen_index][3] = osc_type
+
+        # If 0, or 1... can bypass formula reading
+        # If 2, trigger formula
+        if(osc_type == 2):
+            # max amp
+            amp = ((arg >> 224) & 0xC) >> 2 #Shift 28 bytes, bit_mask hi 2 bits
+            if(amp == 2):
+                amp_formula_check = 1
+            generators[gen_index][4] = amp
+
+            # freq source
+            freq = ((arg >> 224) & 0x3) #Shift 28 bytes, bit_mask low 2 bits
+
+            if(freq == 2):
+                freq_formula_check = 1
+            generators[gen_index][5] = freq
+
+            # Amplitude - Next 14 bytes
+            if(amp_formula_check):
+                # gen1
+                amp_gen1 = ((arg >> 216) & 0xF0) >> 4 #Shift 27 bytes, bit_mask hi 4 bits
+                generators[gen_index][6] = amp_gen1
+
+                # gen2
+                amp_gen2 = ((arg >> 216) & 0x0F) #Shift 27 bytes, bit_mask lo 4 bits
+                generators[gen_index][7] = amp_gen2
+
+                # gen3
+                amp_gen3 = ((arg >> 208) & 0xF0) >> 4 #Shift 26 bytes, bit_mask hi 4 bits
+                generators[gen_index][8] = amp_gen3
+
+                # op1
+                amp_op1 = ((arg >> 208) & 0xC) >> 2 #Shift 26 bytes, bit_mask hi 4 bits
+                generators[gen_index][9] = amp_op1
+
+                # op2
+                amp_op2 = ((arg >> 208) & 0x3) #Shift 26 bytes, bit_mask hi 4 bits
+                generators[gen_index][10] = amp_op2
+
+                # mult1
+                amp_mult1 = ((arg >> 176) & 0xFFFFFFFF) #Shift 22 bytes, bit_mask 4 bytes
+                generators[gen_index][11] = amp_mult1
+
+                # mult2
+                amp_mult2 = ((arg >> 144) & 0xFFFFFFFF) #Shift 18 bytes, bit_mask 4 bytes
+                generators[gen_index][12] = amp_mult2
+
+                # mult3
+                amp_mult3 = ((arg >> 112) & 0xFFFFFFFF) #Shift 14 bytes, bit_mask 4 bytes
+                generators[gen_index][13] = amp_mult3
+
+                # Set waveform amplitudes based off formula
+                set_waveforms[gen_index]
+
+
+            # Frequency - Next 14 bytes
+            if(freq_formula_check):
+                # gen1
+                freq_gen1 = ((arg >> 216) & 0xF0) >> 4 #Shift 27 bytes, bit_mask hi 4 bits
+                generators[gen_index][14] = freq_gen1
+
+                # gen2
+                freq_gen2 = ((arg >> 216) & 0x0F) #Shift 27 bytes, bit_mask lo 4 bits
+                generators[gen_index][15] = freq_gen2
+
+                # gen3
+                freq_gen3 = ((arg >> 208) & 0xF0) >> 4 #Shift 26 bytes, bit_mask hi 4 bits
+                generators[gen_index][16] = freq_gen3
+
+                # op1
+                freq_op1 = ((arg >> 208) & 0xC) >> 2 #Shift 26 bytes, bit_mask hi 4 bits
+                generators[gen_index][17] = freq_op1
+
+                # op2
+                freq_op2 = ((arg >> 208) & 0x3) #Shift 26 bytes, bit_mask hi 4 bits
+                generators[gen_index][18] = freq_op2
+
+                # mult1
+                freq_mult1 = ((arg >> 176) & 0xFFFFFFFF) #Shift 22 bytes, bit_mask 4 bytes
+                generators[gen_index][19] = freq_mult1
+
+                # mult2
+                freq_mult2 = ((arg >> 144) & 0xFFFFFFFF) #Shift 18 bytes, bit_mask 4 bytes
+                generators[gen_index][20] = freq_mult2
+
+                # mult3
+                freq_mult3 = ((arg >> 112) & 0xFFFFFFFF) #Shift 14 bytes, bit_mask 4 bytes
+                generators[gen_index][21] = freq_mult3
+
+        # Calculate formulas
+        # set_amplitude_formula(generators, gen_index, amp_gen1, amp_gen2, amp_gen3, amp_op1, amp_op2, amp_mult1, amp_mult2, amp_mult3)
+        # set_freq_formula(generators, gen_index, freq_gen1, freq_gen2, freq_gen3, freq_op1, freq_op2, freq_mult1, freq_mult2, freq_mult3)
+
+        # handle list of amplitude points (2-4 byte floats - (time_i,val_i)), if necessary
+        if(amp_source):
+            amp_source = 0
+            # done
+            # should set the 44100sample waveforms of amplitudes, using linear interpolation
+
+        # test generator
+        # print(generators[gen_index])
+
+    def reset_generators():
+        # reset generator formulas
+        generators = np.zeros((12,22))
+
+        # Set index calue for each generator
+        for x in range(12):
+            generators[x][1] = x
+
+    def parse_array_bytes(gen_index,num,arg):
+        # Appends to point_array from the first point to the final one
+        for i in range(num):
+             shift_value = (num - i - 1) # If num = 3, cycles through shifts of 2,1,0
+             point_array[gen_index].append(((arg >> (64 * shift_value) + 32)) & 0xFFFFFFFF) # Get time value
+             point_array[gen_index].append((arg >> (64 * shift_value)) & 0xFFFFFFFF) # Get amplitude value
+
+
 # Wave Table Oscillator class
 # Adapted for python and project specificity from C code
 #
@@ -59,7 +220,6 @@ class WaveTableOsc:
 
     def set_phase_offset(offset):
         phase_offset = offset
-
 
     def update_phase():
         phasor = phasor + phase_inc
@@ -188,13 +348,17 @@ def set_sawtooth_sweep():
         sound_buffer[sample_num - count] = sound_buffer[sample_num - count] * count / (sampleRate * 0.05)
         count  = count - 1
 
+        # TODO
         # Write Floate sound
         # deallocate sound_buffer
 
     return
 
-
-
+#
+#set_sawtooth_osc(osc,base_freq)
+#
+# Makes set of wavetables for sawtooth Oscillator
+#
 def set_sawtooth_osc(osc,base_freq):
     # Calculate number of harmonics where the highest harmonic base_freq
     # and lowest alias an octave higher would meet
@@ -230,6 +394,12 @@ def set_sawtooth_osc(osc,base_freq):
         # Update max_harms for next cycle
         max_harms = max_harms >> 1
 
+#
+# makeWaveTable(osc, length, ar, ai, scale, top_freq)
+#
+# if scale is 0, auto-scales
+# returns scaling factor (0.0 if failure) and wavetable in ai Array
+#
 def makeWaveTable(osc, length, ar, ai, scale, top_freq):
     # fft calculation
 
@@ -252,6 +422,11 @@ def makeWaveTable(osc, length, ar, ai, scale, top_freq):
 
     return scale
 
+#
+# define_sawtooth(len, numHarms, ar, ai)
+#
+# Prepares sawtooth harmonics for ifft
+#
 def define_sawtooth(len, numHarms, ar, ai):
     if(numHarms > (len >> 1)):
         numHarms = (len >> 1)
