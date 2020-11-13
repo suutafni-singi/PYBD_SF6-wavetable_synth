@@ -1,6 +1,7 @@
 import sys
 sys.path.append("PYBD_SF6-wavetable_synth/wavetableOsc/")
 from wavetable_osc import *
+from lonwave import LongWave
 # ------------------
 import math
 import pyb
@@ -39,6 +40,12 @@ def main():
         testThreeOSC()
     elif(test == 2):
         testSawSweep()
+        
+    # Code to play wav file
+    #lw = LongWave() # Default uses DAC1 and Timer4
+    #lw.play('hisnibs.wav')
+
+    #lw.play('hisnibs.wav', 120) # 120% speed
 
 def testThreeOsc():
     # Initialize oscillator with wavetables
