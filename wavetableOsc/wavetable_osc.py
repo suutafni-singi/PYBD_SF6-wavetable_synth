@@ -165,7 +165,7 @@ def Generator:
 
         # Set index calue for each generator
         for x in range(12):
-            generators[x][1] = x
+            generators[x][1] = np.float(x)
 
     def parse_array_bytes(gen_index,num,arg):
         # Appends to point_array from the first point to the final one
@@ -232,16 +232,16 @@ class WaveTableOsc:
     #
     # Returns 0 on success, or the number of wavetables if no more room is available
     #
-    def addWaveTable(len, waveTableIn, top_freq):
+    def addWaveTable(L, waveTableIn, top_freq):
         if(numWaveTables < numWaveTableSlots):
             # Create new WaveTable in next slot of wavetable array
-            wavetables[numWaveTables] = np.zeros(len)
+            wavetables[numWaveTables] = np.zeros(L)
             wave_topfreq = top_freq
             wave_length = len
             numWaveTables = numWaveTables + 1
 
             # Fill in new wave table
-            for i in range(len):
+            for i in range(L):
                 wavetables[numWaveTables - 1][i] = waveTableIn[i]
 
             # Return 0 on successfull addition
@@ -261,9 +261,9 @@ class WaveTableOsc:
             wavetable_idx = wavetable_idx + 1
         curr_index = wavetable_idx
 
-        temp = double(phasor * wave_length[curr_index])
-        integer_part = int(temp)
-        frac_part = double(temp - integer_part)
+        temp = float(phasor * wave_length[curr_index])
+        integer_part = uint16(temp)
+        frac_part = float(temp - integer_part)
         samp0 = float(wavetables[curr_index][integer_part]) # Get first sample value
         integer_part = integer_part + 1 # Update the integer part
 
@@ -362,7 +362,7 @@ def set_sawtooth_sweep():
 def set_sawtooth_osc(osc,base_freq):
     # Calculate number of harmonics where the highest harmonic base_freq
     # and lowest alias an octave higher would meet
-    max_harms = int(sampleRate / (3.o * base_freq) + 0.5)
+    max_harms = int(sampleRate / (3.0 * base_freq) + 0.5)
 
     # Round up to the nearest power of two
     v = max_harms

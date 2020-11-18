@@ -1,43 +1,31 @@
 from micropython import const
+from ulab import log2, uint16, float
 
-sampleRate = const(96000)      # in Hz
-fNyquist = const(48000)
+sampleRate = const(48000)      # in Hz
+fNyquist = const(24000)
 bitsInPhaseReg = const(24)
 phaseRegMask = const(((1 << bitsInPhaseReg)-1)) # 0x00ffffff
 bitsInMemAddr = const(12)      # top 12 bits used to index into wavetable, 2^12 = 4096
 memTblLen = const((1 << bitsInMemAddr))  # 4096 data values in wavetable
-<<<<<<< HEAD
 wavTblBitRate = const(24)      #
 bitsInAmpVal = const(24)       # 16 bit unsigned amplitude
 =======
-wavTblBitRate = const(16)      # 
+wavTblBitRate = const(16)      #
 bitsInAmpVal = const(16)       # 16 bit unsigned amplitude
->>>>>>> f69200d4d6ad10732fdb327e3fe567d82149bcae
 numTbls = const(8)
-PI = const(double(3.141592654))
+PI = const(3.141592654)
 
-from math import log2
-# eventually needs to be 12 individual frequency functions capable of accepting input from any other signal
-def Frequency(sampCt,f=440.0):
-    dFreq = double(f)
-    #return int( (dFreq/sampleRate)*(1 << bitsInPhaseReg) )
-    return dFreq/sampleRate
-
-def Amplitude(sampCt,a=0.5):
-    dAmp = double(a)
-    #return int( dAmp * (1 << bitsInAmpVal) )
-    return dAmp
 
 def Interp(phaseReg,freqReg):
 
-    halfTheSamps = memTblLen >> 1    
+    halfTheSamps = memTblLen >> 1
     fSampleIdx = halfTheSamps + phaseReg*halfTheSamps  # fractional sample index
-    iSampleIdx = int(fSampleIdx)                       # integer sample index
+    iSampleIdx = uint16(fSampleIdx)                       # integer sample index
     sampleInterp = fSampleIdx - iSampleIdx             # the difference
 
-    flevel = 0.0 - log2(freqReg << 1)
-    iTblIdx = int(flevel)
-    tblInterp = flevel - iTableIndex
+    flevel = 0.0 - log2((freqReg << 2))
+    iTableIdx = uint16(flevel)
+    tblInterp = flevel - iTableIdx
 
     lowval = highval = 0
     if (flevel < 0):
@@ -56,9 +44,6 @@ def Interp(phaseReg,freqReg):
         r = wavTbls[iTblIdx][sampleCt+1]
         lowval = l + (sampleInterp*(r-l))
         highval = phaseReg
-        tblInterp = 0.875 #### wrooooong
+        tblInterp = 1.0-(freqReg/(1 << (numTbls+2))
 
     return lowval +(tblInterp*(highval-lowval))
-
-class Multifunction:
-    self.__init__(num_channels=12,)
