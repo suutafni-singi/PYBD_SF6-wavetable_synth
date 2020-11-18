@@ -1,7 +1,7 @@
 import pyb
 #from Frequency import Frequency
 #from Amplitude import Amplitude
-import constants
+import '/utils.py'
 from numpy import array
 from numpy import zeros
 from numpy import sin
