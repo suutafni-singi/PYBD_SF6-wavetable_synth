@@ -6,7 +6,7 @@ import pyb
 pyb.country('US') # ISO 3166-1 Alpha-2 code, eg US, GB, DE, AU
 pyb.main('main.py') # main script to run after this one
 machine.freq(216000000)
-pyb.usb_mode('VCP+MSC')
+#pyb.usb_mode('VCP+MSC')
 pyb.usb_mode('VCP+MSC',msc=(pyb.Flash(),))
 if pyb.SDCard().present():
     os.mount(pyb.SDCard(), '/sd')
