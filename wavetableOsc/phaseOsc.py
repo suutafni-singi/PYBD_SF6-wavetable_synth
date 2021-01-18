@@ -1,47 +1,54 @@
 from micropython import const
-from createWavetables import Wavetable
+from .createWavetables import Wavetable
 
 class BaseOscillator(object):
     def __init__(self, sampleRate: int = 0):
-        self._sampleRate = sampleRate
+        self.sampleRate = const(sampleRate)
 
-class Oscillator(BaseOscillator):
-    def __init__(self, number: int, wavTbl: Wavetable, wav: int, addrBits: int = 12, sampleRate: int = 44100) -> None:
+
+class PhaseOsc(BaseOscillator):
+    def __init__(self, number: int, wavTbl: Wavetable, wav: int, numTbls: int = 8, addrBits: int = 12, sampleRate: int = 44100) -> None:
         super().__init__(sampleRate)
         self._num = const(number)
-        self._phReg = 0.
-        self._fReg = 0.
-        self._aReg = 0.
-        self._wavTbl = wavTbl.getWavfrm(wav)
-        self._numTbls = self._wavTbl.shape()[0]
+        self.phReg = 0.
+        self.fReg = 0.
+        self.aReg = 0.
+        self.wavTbl = wavTbl
+        self.waveform = self.wavTbl.getWaveform(wav)
+        self.numTbls = numTbls
+        #self._shape = self._wavTbl.shape
+        #self._numTbls = self._shape[0]
 
+    def upd8Waveform(self, wav: int) -> None:
+        self.wavfrm = self.wavTbl.getWaveform(wav)
 
-    def Frequency(self, f: float = 440.0) -> float:
-        dFreq = f/self._sampleRate
-        return dFreq
+    def upd8Freq(self, f: float = 440.0) -> None:
+        #self.fReg = self.fReg | pack('f',f/self._sampleRate)
+        self.fReg = f/self.sampleRate
 
+    def upd8Amp(self, a: float = 0.5) -> float:
+        self.aReg = a
 
-    def Amplitude(self, a: float = 0.5) -> float:
-        dAmp = a
-        return dAmp
+    def upd8Phase(self):
+        self.phReg += self.fReg/2.
+        if (self.phReg >= 1.0):
+            self.phReg -= 2.0
+        elif (self.phReg < -1.0):
+            self.phReg = -1.0
 
+    def getSamp(self, f: float, a: float):
+        self.upd8Freq(f)
+        self.upd8Amp(a)
+        self.upd8Phase()
+        yield int(self.wavTbl.blinterp(self.waveform,self.numTbls,self.phReg,self.fReg)*self.aReg)
 
-    def getNSamps(self, f: float, a: float, wavTbl: Wavetable, N: int) -> np.uint16:
+    def getNSamps(self, f: float, a: float, N: int) -> list([int]):
         n = 0
+        ret = []
         while n < N:
-          self._fReg = self.Frequency(f)
-          self._aReg = self.Amplitude(a)
-          self._phReg += 2*self._fReg
-          #phaseReg = phaseReg & phaseRegMask
-          if (self._phReg >= 1.0):
-              self._phReg -= 2.0
-          elif (self._phReg < -1.0):
-              self._phReg = -1.0
-
-          yield int(wavTbl.blinterp(self._wavTbl,self._numTbls,self._phReg,self._fReg)*self._aReg)
-          n += 1
-        return
-
+            ret += [s for s in self.getSamp(f,a)]
+            n += 1
+        return ret
 
     def clearRegs(self) -> None:
-        self._fReg = self._aReg = self._phReg = 0.0
+        self.fReg = self.aReg = self.phReg = 0.0
